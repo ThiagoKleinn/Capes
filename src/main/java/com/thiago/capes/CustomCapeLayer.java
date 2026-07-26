@@ -24,9 +24,8 @@ public class CustomCapeLayer extends LayerCape {
         if (!player.isWearing(EnumPlayerModelParts.CAPE)) return;
 
         if (CapeManager.hasCape(player)) {
-            // Injeta temporariamente nossa textura no player
             try {
-                Field capeField = AbstractClientPlayer.class.getDeclaredField("locationOfCape");
+                Field capeField = AbstractClientPlayer.class.getDeclaredField("field_175157_a");
                 capeField.setAccessible(true);
                 Object original = capeField.get(player);
                 capeField.set(player, CapeManager.getCape(player));
