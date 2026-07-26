@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
 public class CustomCapeLayer implements LayerRenderer<AbstractClientPlayer> {
 
@@ -33,6 +34,11 @@ public class CustomCapeLayer implements LayerRenderer<AbstractClientPlayer> {
 
         GlStateManager.pushMatrix();
         this.playerRenderer.getMainModel().bipedBody.postRender(0.0625F);
+        
+        // Habilita blend e alpha test para garantir transparência correta se houver
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableAlpha();
+        
         GlStateManager.translate(0.0F, 0.0F, 0.125F);
 
         double dx = player.prevChasingPosX + (player.chasingPosX - player.prevChasingPosX) * partialTicks

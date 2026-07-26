@@ -2,13 +2,13 @@
   {
     "modid": "customcapes",
     "name": "Custom Capes",
-    "description": "Adds custom capes visible to other players with the mod installed.",
+    "description": "Mod de capas personalizadas de alta qualidade para Minecraft 1.8.9. Permite visualizar e selecionar diversas capas icônicas através de uma interface profissional.",
     "version": "1.0.0",
     "mcversion": "1.8.9",
-    "url": "",
+    "url": "https://github.com/ThiagoKleinn/Capes",
     "updateUrl": "",
     "authorList": ["Thiago Klein"],
-    "credits": "",
+    "credits": "Desenvolvido inteiramente por Thiago Klein. Agradecimentos especiais à comunidade Forge.",
     "logoFile": "",
     "screenshots": [],
     "dependencies": []
