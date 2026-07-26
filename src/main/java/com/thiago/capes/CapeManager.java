@@ -15,9 +15,20 @@ public class CapeManager {
 
     public static void init() {
         // Só registra os nomes, sem carregar texturas
-        AVAILABLE_CAPES.add(new Cape("Default", "assets/customcapes/textures/capes/default.png", false));
-        AVAILABLE_CAPES.add(new Cape("Fire",    "assets/customcapes/textures/capes/fire.png", false));
-        AVAILABLE_CAPES.add(new Cape("Galaxy",  "assets/customcapes/textures/capes/galaxy.png", false));
+        AVAILABLE_CAPES.add(new Cape("Migrator", "assets/customcapes/textures/capes/migrator.png", false));
+        AVAILABLE_CAPES.add(new Cape("Pan",    "assets/customcapes/textures/capes/pan.png", false));
+        AVAILABLE_CAPES.add(new Cape("15th Anniversary",  "assets/customcapes/textures/capes/15thanniversary.png", false));
+        AVAILABLE_CAPES.add(new Cape("Common",  "assets/customcapes/textures/capes/common.png", false));
+        AVAILABLE_CAPES.add(new Cape("Vanilla",  "assets/customcapes/textures/capes/vanilla.png", false));
+        AVAILABLE_CAPES.add(new Cape("Cherry Blossom",  "assets/customcapes/textures/capes/cherryblossom.png", false));
+        // Minecons
+        AVAILABLE_CAPES.add(new Cape("2011 Minecon",  "assets/customcapes/textures/capes/2011.png", false));
+        AVAILABLE_CAPES.add(new Cape("2012 Minecon",  "assets/customcapes/textures/capes/2012.png", false));
+        AVAILABLE_CAPES.add(new Cape("2013 Minecon",  "assets/customcapes/textures/capes/2013.png", false));
+        AVAILABLE_CAPES.add(new Cape("2015 Minecon",  "assets/customcapes/textures/capes/2015.png", false));
+        AVAILABLE_CAPES.add(new Cape("2016 Minecon",  "assets/customcapes/textures/capes/2016.png", false));
+        // Minecon Live 2019
+        AVAILABLE_CAPES.add(new Cape("Founders",  "assets/customcapes/textures/capes/founders.png", false));
         loadConfig();
     }
 
