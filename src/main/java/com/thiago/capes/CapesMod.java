@@ -19,10 +19,12 @@ public class CapesMod {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         CapeManager.init();
+        KeyHandler.register();
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(new CapeRenderer());
+        MinecraftForge.EVENT_BUS.register(new KeyHandler());
     }
 }
