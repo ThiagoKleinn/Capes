@@ -1,6 +1,7 @@
 package com.thiago.capes;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerCape;
 import net.minecraft.entity.player.EnumPlayerModelParts;
@@ -22,24 +23,31 @@ public class CustomCapeLayer extends LayerCape {
         if (!CapeManager.hasCape(player)) return;
 
         try {
-            // Injeta a textura no campo da capa
-            Field capeField = AbstractClientPlayer.class.getDeclaredField("field_175157_a");
-            capeField.setAccessible(true);
-            Object original = capeField.get(player);
-            capeField.set(player, CapeManager.getCape(player));
+            // Pega o NetworkPlayerInfo do player
+            Field playerInfoField = AbstractClientPlayer.class.getDeclaredField("field_175157_a");
+            playerInfoField.setAccessible(true);
+            NetworkPlayerInfo info = (NetworkPlayerInfo) playerInfoField.get(player);
 
-            // Força hasCape() a retornar true via field_175155_b
-            Field hasCapeField = AbstractClientPlayer.class.getDeclaredField("field_175155_b");
+            // Pega os campos do NetworkPlayerInfo
+            Field hasCapeField = NetworkPlayerInfo.class.getDeclaredField("field_178864_d");
+            Field capeTextureField = NetworkPlayerInfo.class.getDeclaredField("field_178865_e");
             hasCapeField.setAccessible(true);
-            boolean originalHasCape = (boolean) hasCapeField.get(player);
-            hasCapeField.set(player, true);
+            capeTextureField.setAccessible(true);
+
+            // Salva os valores originais
+            boolean originalHasCape = (boolean) hasCapeField.get(info);
+            Object originalTexture = capeTextureField.get(info);
+
+            // Injeta nossa capa
+            hasCapeField.set(info, true);
+            capeTextureField.set(info, CapeManager.getCape(player));
 
             super.doRenderLayer(player, limbSwing, limbSwingAmount, partialTicks,
                     ageInTicks, netHeadYaw, headPitch, scale);
 
-            // Restaura os valores originais
-            capeField.set(player, original);
-            hasCapeField.set(player, originalHasCape);
+            // Restaura
+            hasCapeField.set(info, originalHasCape);
+            capeTextureField.set(info, originalTexture);
 
         } catch (Exception e) {
             e.printStackTrace();
