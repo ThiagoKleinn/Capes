@@ -1,21 +1,46 @@
+package com.thiago.capes;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.renderer.entity.layers.LayerRenderer;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+
+import java.util.Map;
+
 public class CapeRenderer {
 
+    private boolean injected = false;
+
     @SubscribeEvent
-    public void onRenderPlayer(RenderPlayerEvent.Pre event) {
-        // Não faz nada aqui — o hook é no LayerCape
+    public void onRenderTick(TickEvent.RenderTickEvent event) {
+        if (injected) return;
+
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.thePlayer == null) return;
+
+        injectCapeLayer(mc.getRenderManager());
+        injected = true;
     }
 
-    // O melhor ponto de hook é substituindo o LayerCape
-    // Registre isso no init do mod:
-    public static void injectCapeLayer(RenderManager rm) {
-        RenderPlayer renderer = (RenderPlayer) rm.getEntityRenderObject(
-                Minecraft.getMinecraft().thePlayer
-        );
+    private void injectCapeLayer(RenderManager rm) {
+        for (Map.Entry<String, RenderPlayer> entry : rm.getSkinMap().entrySet()) {
+            RenderPlayer renderer = entry.getValue();
 
-        // Remove o layer original de capa
-        renderer.removeLayer(LayerCape.class);
+            try {
+                java.lang.reflect.Field field = net.minecraft.client.renderer.entity.RendererLivingEntity.class
+                        .getDeclaredField("layerRenderers");
+                field.setAccessible(true);
 
-        // Adiciona o seu
-        renderer.addLayer(new CustomCapeLayer(renderer));
+                @SuppressWarnings("unchecked")
+                java.util.List<LayerRenderer<?>> layers = (java.util.List<LayerRenderer<?>>) field.get(renderer);
+                layers.removeIf(layer -> layer instanceof net.minecraft.client.renderer.entity.layers.LayerCape);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            renderer.addLayer(new CustomCapeLayer(renderer));
+        }
     }
 }
