@@ -12,11 +12,16 @@ public class Cape {
 
     public final String name;
     public final ResourceLocation resource;
+    private final String texturePath;
 
-    public Cape(String name, String texturePath) {
+    public Cape(String name, String texturePath, boolean loadNow) {
         this.name = name;
+        this.texturePath = texturePath;
         this.resource = new ResourceLocation("customcapes/cape/" + name.toLowerCase().replace(" ", "_"));
+        if (loadNow) loadTexture();
+    }
 
+    public void loadTexture() {
         try {
             InputStream is = Cape.class.getClassLoader().getResourceAsStream(texturePath);
             if (is == null) throw new RuntimeException("Texture not found: " + texturePath);

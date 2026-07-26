@@ -14,11 +14,17 @@ public class CapeManager {
     private static Cape selectedCape = null;
 
     public static void init() {
-        AVAILABLE_CAPES.add(new Cape("Default", "assets/customcapes/textures/capes/default.png"));
-        AVAILABLE_CAPES.add(new Cape("Fire",    "assets/customcapes/textures/capes/fire.png"));
-        AVAILABLE_CAPES.add(new Cape("Galaxy",  "assets/customcapes/textures/capes/galaxy.png"));
-
+        // Só registra os nomes, sem carregar texturas
+        AVAILABLE_CAPES.add(new Cape("Default", "assets/customcapes/textures/capes/default.png", false));
+        AVAILABLE_CAPES.add(new Cape("Fire",    "assets/customcapes/textures/capes/fire.png", false));
+        AVAILABLE_CAPES.add(new Cape("Galaxy",  "assets/customcapes/textures/capes/galaxy.png", false));
         loadConfig();
+    }
+
+    public static void loadTextures() {
+        for (Cape cape : AVAILABLE_CAPES) {
+            cape.loadTexture();
+        }
     }
 
     public static ResourceLocation getCape(AbstractClientPlayer player) {

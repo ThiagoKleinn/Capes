@@ -12,16 +12,22 @@ import java.util.Map;
 public class CapeRenderer {
 
     private boolean injected = false;
+    private boolean capesLoaded = false;
 
     @SubscribeEvent
     public void onRenderTick(TickEvent.RenderTickEvent event) {
-        if (injected) return;
-
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.thePlayer == null) return;
 
-        injectCapeLayer(mc.getRenderManager());
-        injected = true;
+        if (!capesLoaded) {
+            CapeManager.loadTextures();
+            capesLoaded = true;
+        }
+
+        if (!injected) {
+            injectCapeLayer(mc.getRenderManager());
+            injected = true;
+        }
     }
 
     private void injectCapeLayer(RenderManager rm) {
