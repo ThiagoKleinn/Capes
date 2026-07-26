@@ -1,0 +1,16 @@
+[
+  {
+    "modid": "customcapes",
+    "name": "Custom Capes",
+    "description": "Adds custom capes visible to other players with the mod installed.",
+    "version": "1.0.0",
+    "mcversion": "1.8.9",
+    "url": "",
+    "updateUrl": "",
+    "authorList": ["Thiago Klein"],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
