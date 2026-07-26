@@ -73,13 +73,15 @@ public class CustomCapeLayer implements LayerRenderer<AbstractClientPlayer> {
         GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
 
         ModelBiped model = (ModelBiped) this.playerRenderer.getMainModel();
-        GlStateManager.scale(-1.0F, -1.0F, 1.0F);
-        GlStateManager.translate(0.0F, -1.0F, 0.0F);  // era -1.6F
+        GlStateManager.scale(-1.0F, 1.0F, 1.0F);
+        GlStateManager.translate(0.0F, 0.0F, 0.0F);
 
         net.minecraft.client.model.ModelRenderer capeModel =
                 new net.minecraft.client.model.ModelRenderer(model, 0, 0);
-        capeModel.addBox(-5.0F, 0.0F, -1.0F, 10, 16, 1);  // mantém
-        capeModel.rotationPointY = 0.0F;  // era -2.0F
+        capeModel.textureWidth = 64;
+        capeModel.textureHeight = 32;
+        capeModel.addBox(-5.0F, 0.0F, -1.0F, 10, 16, 1);
+        capeModel.rotationPointY = 0.0F;
         capeModel.render(0.0625F);
 
         GlStateManager.popMatrix();
