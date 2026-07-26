@@ -9,11 +9,8 @@ import java.lang.reflect.Field;
 
 public class CustomCapeLayer extends LayerCape {
 
-    private final RenderPlayer playerRenderer;
-
     public CustomCapeLayer(RenderPlayer playerRenderer) {
         super(playerRenderer);
-        this.playerRenderer = playerRenderer;
     }
 
     @Override
@@ -22,20 +19,30 @@ public class CustomCapeLayer extends LayerCape {
 
         if (!player.hasPlayerInfo()) return;
         if (!player.isWearing(EnumPlayerModelParts.CAPE)) return;
+        if (!CapeManager.hasCape(player)) return;
 
-        if (CapeManager.hasCape(player)) {
-            try {
-                Field capeField = AbstractClientPlayer.class.getDeclaredField("field_175157_a");
-                capeField.setAccessible(true);
-                Object original = capeField.get(player);
-                capeField.set(player, CapeManager.getCape(player));
-                super.doRenderLayer(player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
-                capeField.set(player, original);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            super.doRenderLayer(player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
+        try {
+            // Injeta a textura no campo da capa
+            Field capeField = AbstractClientPlayer.class.getDeclaredField("field_175157_a");
+            capeField.setAccessible(true);
+            Object original = capeField.get(player);
+            capeField.set(player, CapeManager.getCape(player));
+
+            // Força hasCape() a retornar true via field_175155_b
+            Field hasCapeField = AbstractClientPlayer.class.getDeclaredField("field_175155_b");
+            hasCapeField.setAccessible(true);
+            boolean originalHasCape = (boolean) hasCapeField.get(player);
+            hasCapeField.set(player, true);
+
+            super.doRenderLayer(player, limbSwing, limbSwingAmount, partialTicks,
+                    ageInTicks, netHeadYaw, headPitch, scale);
+
+            // Restaura os valores originais
+            capeField.set(player, original);
+            hasCapeField.set(player, originalHasCape);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
