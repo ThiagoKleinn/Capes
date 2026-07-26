@@ -1,17 +1,20 @@
 package com.thiago.capes;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.network.NetworkPlayerInfo;
+import net.minecraft.client.model.ModelBiped;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
-import net.minecraft.client.renderer.entity.layers.LayerCape;
+import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.player.EnumPlayerModelParts;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
 
-import java.lang.reflect.Field;
+public class CustomCapeLayer implements LayerRenderer<AbstractClientPlayer> {
 
-public class CustomCapeLayer extends LayerCape {
+    private final RenderPlayer playerRenderer;
 
     public CustomCapeLayer(RenderPlayer playerRenderer) {
-        super(playerRenderer);
+        this.playerRenderer = playerRenderer;
     }
 
     @Override
@@ -22,35 +25,68 @@ public class CustomCapeLayer extends LayerCape {
         if (!player.isWearing(EnumPlayerModelParts.CAPE)) return;
         if (!CapeManager.hasCape(player)) return;
 
-        try {
-            // Pega o NetworkPlayerInfo do player
-            Field playerInfoField = AbstractClientPlayer.class.getDeclaredField("field_175157_a");
-            playerInfoField.setAccessible(true);
-            NetworkPlayerInfo info = (NetworkPlayerInfo) playerInfoField.get(player);
+        ResourceLocation capeTexture = CapeManager.getCape(player);
+        if (capeTexture == null) return;
 
-            // Pega os campos do NetworkPlayerInfo
-            Field hasCapeField = NetworkPlayerInfo.class.getDeclaredField("field_178864_d");
-            Field capeTextureField = NetworkPlayerInfo.class.getDeclaredField("field_178865_e");
-            hasCapeField.setAccessible(true);
-            capeTextureField.setAccessible(true);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        this.playerRenderer.bindTexture(capeTexture);
 
-            // Salva os valores originais
-            boolean originalHasCape = (boolean) hasCapeField.get(info);
-            Object originalTexture = capeTextureField.get(info);
+        GlStateManager.pushMatrix();
+        this.playerRenderer.getMainModel().bipedBody.postRender(0.0625F);
+        GlStateManager.translate(0.0F, 0.0F, 0.125F);
 
-            // Injeta nossa capa
-            hasCapeField.set(info, true);
-            capeTextureField.set(info, CapeManager.getCape(player));
+        double dx = player.prevChasingPosX + (player.chasingPosX - player.prevChasingPosX) * partialTicks
+                - (player.prevPosX + (player.posX - player.prevPosX) * partialTicks);
+        double dy = player.prevChasingPosY + (player.chasingPosY - player.prevChasingPosY) * partialTicks
+                - (player.prevPosY + (player.posY - player.prevPosY) * partialTicks);
+        double dz = player.prevChasingPosZ + (player.chasingPosZ - player.prevChasingPosZ) * partialTicks
+                - (player.prevPosZ + (player.posZ - player.prevPosZ) * partialTicks);
 
-            super.doRenderLayer(player, limbSwing, limbSwingAmount, partialTicks,
-                    ageInTicks, netHeadYaw, headPitch, scale);
+        float yaw = player.prevRenderYawOffset
+                + (player.renderYawOffset - player.prevRenderYawOffset) * partialTicks;
 
-            // Restaura
-            hasCapeField.set(info, originalHasCape);
-            capeTextureField.set(info, originalTexture);
+        double sinYaw = Math.sin(yaw * Math.PI / 180.0D);
+        double cosYaw = -Math.cos(yaw * Math.PI / 180.0D);
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        float swingY = (float)(dy * 10.0D);
+        swingY = MathHelper.clamp_float(swingY, -6.0F, 32.0F);
+
+        float swingX = (float)(dx * sinYaw + dz * cosYaw) * 100.0F;
+        swingX = MathHelper.clamp_float(swingX, 0.0F, 150.0F);
+
+        float swingZ = (float)(dx * cosYaw - dz * sinYaw) * 100.0F;
+        swingZ = MathHelper.clamp_float(swingZ, -20.0F, 20.0F);
+
+        float pitch = player.prevCameraYaw
+                + (player.cameraYaw - player.prevCameraYaw) * partialTicks;
+        float walked = player.prevDistanceWalkedModified
+                + (player.distanceWalkedModified - player.prevDistanceWalkedModified) * partialTicks;
+        swingY += MathHelper.sin(walked * 6.0F) * 32.0F * pitch;
+
+        if (player.isSneaking()) {
+            GlStateManager.translate(0.0F, 0.2F, 0.0F);
         }
+
+        GlStateManager.rotate(6.0F + swingX / 2.0F + swingY, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(swingZ / 2.0F, 0.0F, 0.0F, 1.0F);
+        GlStateManager.rotate(-swingZ / 2.0F, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+
+        ModelBiped model = (ModelBiped) this.playerRenderer.getMainModel();
+        GlStateManager.scale(-1.0F, -1.0F, 1.0F);
+        GlStateManager.translate(0.0F, -1.0F, 0.0F);  // era -1.6F
+
+        net.minecraft.client.model.ModelRenderer capeModel =
+                new net.minecraft.client.model.ModelRenderer(model, 0, 0);
+        capeModel.addBox(-5.0F, 0.0F, -1.0F, 10, 16, 1);  // mantém
+        capeModel.rotationPointY = 0.0F;  // era -2.0F
+        capeModel.render(0.0625F);
+
+        GlStateManager.popMatrix();
+    }
+
+    @Override
+    public boolean shouldCombineTextures() {
+        return false;
     }
 }
