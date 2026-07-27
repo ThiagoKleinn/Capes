@@ -33,4 +33,4 @@ Mod de capas personalizadas para Minecraft 1.8.9, desenvolvido inteiramente por 
 Desenvolvido por: **Thiago Klein**
 
 ---
-© 2024 Thiago Klein. Todos os direitos reservados.
+© 2026 Thiago Klein. Todos os direitos reservados.
